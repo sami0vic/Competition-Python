@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBRoQz-SLs6bwLLfJFZORsESHkNLUOVcX8",
@@ -20,7 +20,7 @@ const signupButton = document.getElementById("sign-up");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const main = document.getElementById("main");
-const createacct = document.getElementById("create-acct")
+const createacct = document.getElementById("create-acct");
 
 const signupEmailIn = document.getElementById("email-signup");
 const confirmSignupEmailIn = document.getElementById("confirm-email-signup");
@@ -32,20 +32,28 @@ const returnBtn = document.getElementById("return-btn");
 
 var email, password, signupEmail, signupPassword, confirmSignupEmail, confirmSignUpPassword;
 
+// Check authentication state on page load
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is signed in, redirect to problems.html
+    window.location.href = "problems.html";
+  }
+});
+
 createacctbtn.addEventListener("click", function() {
   var isVerified = true;
 
   signupEmail = signupEmailIn.value;
   confirmSignupEmail = confirmSignupEmailIn.value;
   if(signupEmail != confirmSignupEmail) {
-      window.alert("Email fields do not match. Try again.")
+      window.alert("Email fields do not match. Try again.");
       isVerified = false;
   }
 
   signupPassword = signupPasswordIn.value;
   confirmSignUpPassword = confirmSignUpPasswordIn.value;
   if(signupPassword != confirmSignUpPassword) {
-      window.alert("Password fields do not match. Try again.")
+      window.alert("Password fields do not match. Try again.");
       isVerified = false;
   }
   
@@ -82,8 +90,7 @@ submitButton.addEventListener("click", function() {
       // Signed in
       const user = userCredential.user;
       console.log("Success! Welcome back!");
-      //window.alert("Success! Welcome back!");
-      // Redirect to index1.html
+      // Redirect to problems.html
       window.location.href = "problems.html";
     })
     .catch((error) => {
@@ -93,7 +100,6 @@ submitButton.addEventListener("click", function() {
       window.alert("Error occurred. Try again.");
     });
 });
-
 
 signupButton.addEventListener("click", function() {
     main.style.display = "none";
