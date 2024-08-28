@@ -12,6 +12,10 @@
             background-color: #0d0d0d; /* Dark background */
             color: #39ff14; /* Neon Green */
         }
+        .contest_end {
+            display: none;
+            text-align: center; /* Center align text inside these divs */
+        }
         .exercise-container {
             max-width: 800px;
             margin: 0 auto;
@@ -147,6 +151,10 @@
             color: white; /* Set color to white for better visibility */
             font-size: 1em; /* Set font size to 0.9em */
         }
+        .red-text {
+            color: red; /* Set color to white for better visibility */
+            font-size: 6vw; /* Set font size to 0.9em */
+        }
         .popup-container {
             position: fixed;
             top: 20px;
@@ -168,7 +176,7 @@
             
     </canvas>
     <div class="countdown">
-        <h1>Competition Countdown</h1>
+        <h1>XDEV Classification #1</h1>
         <span id="countdown-text" class="white-text">Countdown until the start of the competition:</span>
             <br>
         <div id="timer" class="timer">
@@ -177,6 +185,10 @@
             <span id="minutes">00</span> :
             <span id="seconds">00</span>
         </div>
+    </div>
+    <div class="contest_end">
+        <h1>XDEV Classification #1</h1>
+        <span id="message_end" class="red-text">Contest Ended</span>
     </div>
     <div class="popup-container" id="popup">
         <b><span id="popup-timer"></span></b>
@@ -218,98 +230,77 @@
     </div>
 
     <script>
-var canvas = document.querySelector('canvas'),
-    ctx = canvas.getContext('2d');
+var canvas = document.querySelector('canvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-// Setting the width and height of the canvas
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+    var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    var fontSize = 10;
+    var columns = canvas.width / fontSize;
+    var drops = Array(columns).fill(1);
 
-// Setting up the letters
-var letters = 'ABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZABCDEFGHIJKLMNOPQRSTUVXYZ';
-letters = letters.split('');
-
-// Setting up the columns
-var fontSize = 10,
-    columns = canvas.width / fontSize;
-
-// Setting up the drops
-var drops = [];
-for (var i = 0; i < columns; i++) {
-  drops[i] = 1;
-}
-
-// Setting up the draw function
-function draw() {
-  ctx.fillStyle = 'rgba(0, 0, 0, .1)';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  for (var i = 0; i < drops.length; i++) {
-    var text = letters[Math.floor(Math.random() * letters.length)];
-    ctx.fillStyle = '#0f0';
-    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-    drops[i]++;
-    if (drops[i] * fontSize > canvas.height && Math.random() > .95) {
-      drops[i] = 0;
+    function draw() {
+        ctx.fillStyle = 'rgba(0, 0, 0, .1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (var i = 0; i < drops.length; i++) {
+            var text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillStyle = '#0f0';
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            drops[i]++;
+            if (drops[i] * fontSize > canvas.height && Math.random() > .975) {
+                drops[i] = 0;
+            }
+        }
     }
-  }
-}
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Set the competition start time (in milliseconds)
-    const competitionStartTime = Date.parse('2024-05-03T09:30:00+0100');
+    function formatTime(time, digits = 2) {
+        return time.toString().padStart(digits, '0');
+    }
 
-    const countdownDiv = document.querySelector('.countdown');
-    const problemDiv = document.querySelector('.exercise-container');
-    const popup = document.getElementById('popup');
+    document.addEventListener('DOMContentLoaded', function () {
+        const competitionStartTime = Date.parse('2024-08-26T09:30:00+0100');
+        const competitionEndTime = Date.parse('2024-08-27T12:30:00+0100');
 
-    const timer = setInterval(function () {
-        const now = new Date().getTime(); // Update now inside the interval
-        const timeRemaining = competitionStartTime - now;
+        const countdownDiv = document.querySelector('.countdown');
+        const contestEndDiv = document.querySelector('.contest_end');
 
-        if (timeRemaining <= 0) {
-            clearInterval(timer);
-            countdownDiv.style.display = 'none'; // Hide countdown
-            problemDiv.style.display = 'block'; // Show problems
+        const timer = setInterval(function () {
+            const now = new Date().getTime();
+            const timeRemaining = competitionStartTime - now;
+            const timeUntilEnd = competitionEndTime - now;
 
-            // Show popup
-            popup.style.display = 'block';
+            if (timeRemaining <= 0 && timeUntilEnd > 0) {
+                countdownDiv.style.display = 'none'; // Hide countdown
+                contestEndDiv.style.display = 'none'; // Hide contest end message
+            } else if (timeUntilEnd <= 0) {
+                clearInterval(timer);
+                countdownDiv.style.display = 'none'; // Hide countdown
+                contestEndDiv.style.display = 'block'; // Show contest end message
+            } else if (timeRemaining > 0) {
+                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-            // Display timer in the popup
-            const popupTimer = document.getElementById('popup-timer');
-            const popupTimerInterval = setInterval(function () {
-                const elapsedTime = new Date().getTime() - competitionStartTime; // Update elapsedTime
-                const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
-                const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-                popupTimer.textContent = `Competition Time: ${hours}h ${minutes}m ${seconds}s`;
-            }, 1000);
+                document.getElementById('days').innerText = formatTime(days);
+                document.getElementById('hours').innerText = formatTime(hours);
+                document.getElementById('minutes').innerText = formatTime(minutes);
+                document.getElementById('seconds').innerText = formatTime(seconds);
 
-            return;
-        }
-        
-        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                const timerElement = document.getElementById('timer');
+                if (days < 1 && hours < 1) {
+                    timerElement.classList.add('less-than-hour');
+                } else {
+                    timerElement.classList.remove('less-than-hour');
+                }
+                
+                countdownDiv.style.display = 'block'; // Ensure countdown is visible
+                contestEndDiv.style.display = 'none'; // Ensure contest end message is hidden
+            }
+        }, 1000);
+    });
 
-        document.getElementById('days').innerText = formatTime(days);
-        document.getElementById('hours').innerText = formatTime(hours);
-        document.getElementById('minutes').innerText = formatTime(minutes);
-        document.getElementById('seconds').innerText = formatTime(seconds);
-
-        // Update timer color based on remaining time
-        const timerElement = document.getElementById('timer');
-        if (days < 1 && hours < 1) {
-            timerElement.classList.add('less-than-hour');
-        } else {
-            timerElement.classList.remove('less-than-hour');
-        }
-    }, 1000);
-});
-
-function formatTime(time, digits = 2) {
-    return time.toString().padStart(digits, '0');
-}
 
 </script>
 </body>
