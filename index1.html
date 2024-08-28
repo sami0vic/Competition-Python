@@ -172,13 +172,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Matrix+Code+NFI&display=swap">
 </head>
 <body>
-    <canvas>
-            
-    </canvas>
+    <canvas></canvas>
     <div class="countdown">
         <h1>XDEV Classification #1</h1>
         <span id="countdown-text" class="white-text">Countdown until the start of the competition:</span>
-            <br>
+        <br>
         <div id="timer" class="timer">
             <span id="days">00</span> d :
             <span id="hours">00</span> :
@@ -208,100 +206,119 @@
         <h2>1. Calculatrice Simple :</h2>
         <p>Développez une calculatrice simple capable d'effectuer des opérations arithmétiques de base telles que l'addition, la soustraction, la multiplication et la division. L'interface utilisateur doit permettre à l'utilisateur d'entrer les opérands et de sélectionner l'opération à effectuer.</p>
         <pre><code>
-    Opération(Addition, Soustraction, Multiplication, Division) : Addition
-    Entrer le premier nombre : 5
-    Entrer le deuxième nombre : 7
-    Résultat : 12
+Opération(Addition, Soustraction, Multiplication, Division) : Addition
+Entrer le premier nombre : 5
+Entrer le deuxième nombre : 7
+Résultat : 12
         </code></pre>
         <br>
         <h2>2. Jeu de Devinettes :</h2>
         <p>Créez un jeu de devinettes où l'ordinateur choisit aléatoirement un nombre et le joueur doit deviner ce nombre. Le jeu doit fournir des indices (plus petit, plus grand) pour aider le joueur à deviner.</p>
         <p>Vous utiliserez <a href="https://www.w3schools.com/python/ref_random_randrange.asp" style="color: #39ff14;" target="_blank">random</a> (Visite le <a href="https://www.w3schools.com/python/ref_random_randrange.asp" style="color: #39ff14;" target="_blank">lien</a>)</p>
         <pre><code>
-    Devinez le nombre entre 1 et 100 :
-    50
-    Plus grand !
-    75
-    Plus petit !
-    63
-    Félicitations ! Vous avez deviné le nombre en 3 tentatives.
+Devinez le nombre entre 1 et 100 :
+50
+Plus grand !
+75
+Plus petit !
+63
+Félicitations ! Vous avez deviné le nombre en 3 tentatives.
         </code></pre>
         <br>
     </div>
 
     <script>
-var canvas = document.querySelector('canvas');
-    var ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+        var canvas = document.querySelector('canvas'),
+            ctx = canvas.getContext('2d');
 
-    var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    var fontSize = 10;
-    var columns = canvas.width / fontSize;
-    var drops = Array(columns).fill(1);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-    function draw() {
-        ctx.fillStyle = 'rgba(0, 0, 0, .1)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        for (var i = 0; i < drops.length; i++) {
-            var text = letters[Math.floor(Math.random() * letters.length)];
-            ctx.fillStyle = '#0f0';
-            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-            drops[i]++;
-            if (drops[i] * fontSize > canvas.height && Math.random() > .975) {
-                drops[i] = 0;
+        var letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.repeat(6).split('');
+        var fontSize = 10;
+        var columns = canvas.width / fontSize;
+        var drops = Array.from({ length: columns }, () => 1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, .1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            for (var i = 0; i < drops.length; i++) {
+                var text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillStyle = '#0f0';
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                drops[i]++;
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
             }
         }
-    }
 
-    function formatTime(time, digits = 2) {
-        return time.toString().padStart(digits, '0');
-    }
+        setInterval(draw, 30); // Animate the canvas
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const competitionStartTime = Date.parse('2024-08-26T09:30:00+0100');
-        const competitionEndTime = Date.parse('2024-08-27T12:30:00+0100');
+        document.addEventListener('DOMContentLoaded', function () {
+            const competitionStartTime = Date.parse('2024-08-27T13:11:00+0100');
+            const competitionEndTime = Date.parse('2024-08-27T09:30:00+0100');
 
-        const countdownDiv = document.querySelector('.countdown');
-        const contestEndDiv = document.querySelector('.contest_end');
+            const countdownDiv = document.querySelector('.countdown');
+            const problemDiv = document.querySelector('.exercise-container');
+            const popup = document.getElementById('popup');
+            const popupTimer = document.getElementById('popup-timer');
 
-        const timer = setInterval(function () {
-            const now = new Date().getTime();
-            const timeRemaining = competitionStartTime - now;
-            const timeUntilEnd = competitionEndTime - now;
+            const timer = setInterval(function () {
+                const now = new Date().getTime();
+                const timeRemaining = competitionStartTime - now;
+                const timeUntilEnd = competitionEndTime - now;
 
-            if (timeRemaining <= 0 && timeUntilEnd > 0) {
-                countdownDiv.style.display = 'none'; // Hide countdown
-                contestEndDiv.style.display = 'none'; // Hide contest end message
-            } else if (timeUntilEnd <= 0) {
-                clearInterval(timer);
-                countdownDiv.style.display = 'none'; // Hide countdown
-                contestEndDiv.style.display = 'block'; // Show contest end message
-            } else if (timeRemaining > 0) {
-                const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+                if (timeRemaining <= 0 && timeUntilEnd > 0) {
+                    countdownDiv.style.display = 'none'; // Hide countdown
+                    problemDiv.style.display = 'block'; // Show problems
+                    popup.style.display = 'block'; // Show popup
+                    clearInterval(timer); // Stop the countdown timer
+                    
+                    const popupTimerInterval = setInterval(function () {
+                        const elapsedTime = new Date().getTime() - competitionStartTime;
+                        const hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+                        const minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                        popupTimer.textContent = `Competition Time: ${hours}h ${minutes}m ${seconds}s`;
+                    }, 1000);
+                    
+                    // Clear popup timer interval when the competition ends
+                    setTimeout(() => clearInterval(popupTimerInterval), timeUntilEnd);
+                    return;
+                } else if (timeUntilEnd <= 0) {
+                    countdownDiv.style.display = 'none'; // Hide countdown
+                    problemDiv.style.display = 'none'; // Hide problems
+                    popup.style.display = 'none'; // Hide popup
+                    document.querySelector('.contest_end').style.display = 'block'; // Show contest end message
+                    clearInterval(timer); // Stop the countdown timer
+                } else if (timeRemaining > 0) {
+                    const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
-                document.getElementById('days').innerText = formatTime(days);
-                document.getElementById('hours').innerText = formatTime(hours);
-                document.getElementById('minutes').innerText = formatTime(minutes);
-                document.getElementById('seconds').innerText = formatTime(seconds);
+                    document.getElementById('days').innerText = formatTime(days);
+                    document.getElementById('hours').innerText = formatTime(hours);
+                    document.getElementById('minutes').innerText = formatTime(minutes);
+                    document.getElementById('seconds').innerText = formatTime(seconds);
 
-                const timerElement = document.getElementById('timer');
-                if (days < 1 && hours < 1) {
-                    timerElement.classList.add('less-than-hour');
-                } else {
-                    timerElement.classList.remove('less-than-hour');
+                    const timerElement = document.getElementById('timer');
+                    if (days < 1 && hours < 1) {
+                        timerElement.classList.add('less-than-hour');
+                    } else {
+                        timerElement.classList.remove('less-than-hour');
+                    }
+                    
+                    countdownDiv.style.display = 'block'; // Ensure countdown is visible
+                    problemDiv.style.display = 'none'; // Ensure problems are hidden
                 }
-                
-                countdownDiv.style.display = 'block'; // Ensure countdown is visible
-                contestEndDiv.style.display = 'none'; // Ensure contest end message is hidden
-            }
-        }, 1000);
-    });
+            }, 1000);
+        });
 
-
-</script>
+        function formatTime(time, digits = 2) {
+            return time.toString().padStart(digits, '0');
+        }
+    </script>
 </body>
 </html>
