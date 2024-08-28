@@ -84,7 +84,7 @@ submitButton.addEventListener("click", function() {
       console.log("Success! Welcome back!");
       //window.alert("Success! Welcome back!");
       // Redirect to index1.html
-      window.location.href = "index1.html";
+      window.location.href = "problems.html";
     })
     .catch((error) => {
       const errorCode = error.code;
